@@ -1,7 +1,3 @@
-import "@rork/polyfills";
-import { BundleInspector } from '@rork/inspector';
-import { RorkSafeInsets } from '@rork/safe-insets';
-import { RorkErrorBoundary } from '@rork/rork-error-boundary';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -67,7 +63,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BundleInspector><RorkSafeInsets><RorkErrorBoundary><RootLayoutNav /></RorkErrorBoundary></RorkSafeInsets></BundleInspector>
+        <RootLayoutNav />
       </AuthProvider>
     </QueryClientProvider>
   );
