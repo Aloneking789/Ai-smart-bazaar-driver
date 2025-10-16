@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://fb8ng6th-3001.inc1.devtunnels.ms/api/v1';
+export const BASE_URL = 'https://zeptogkp.vercel.app/api/v1';
 
 export interface ApiError {
   message: string;

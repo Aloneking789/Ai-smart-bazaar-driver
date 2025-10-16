@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { Stack } from 'expo-router';
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Package, MapPin, DollarSign, CheckCircle, XCircle } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { ordersApi } from '@/utils/api';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Stack } from 'expo-router';
+import { CheckCircle, DollarSign, MapPin, Package, XCircle } from 'lucide-react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import colors from '@/constants/colors';
 
@@ -27,7 +27,7 @@ export default function OrdersScreen() {
   const orderActionMutation = useMutation({
     mutationFn: async ({ orderId, action }: { orderId: string; action: string }) => {
       if (!token) throw new Error('No token');
-      
+
       switch (action) {
         case 'accept':
           return await ordersApi.acceptOrder(orderId, token);
@@ -52,11 +52,41 @@ export default function OrdersScreen() {
 
   const orders = data?.orders || [];
 
+  // Server returns both `status` and `deliveryStatus` (legacy). Prefer `status` for real phase.
+  // Map server `status` values to UI phases used in the app.
+  const getPhase = (order: any) => {
+    // order.status examples: 'ASSIGNED', 'DELIVERY_ACCEPTED', 'DELIVERY_PICKUP', 'DELIVERED', 'REJECTED'
+    const s = order.status || order.deliveryStatus;
+    switch (s) {
+      case 'ASSIGNED':
+      case 'DELIVERY_ASSIGNED':
+        return 'assigned';
+      case 'ACCEPTED':
+      case 'DELIVERY_ACCEPTED':
+        return 'accepted';
+      case 'DELIVERY_PICKUP':
+      case 'PICKED_UP':
+        return 'picked_up';
+      case 'DELIVERED':
+        return 'delivered';
+      case 'REJECTED':
+        return 'rejected';
+      default:
+        return 'unknown';
+    }
+  };
+
+  const getDisplayStatus = (order: any) => {
+    // Prefer human-readable deliveryStatus if present, otherwise use status
+    return order.deliveryStatus || order.status || 'UNKNOWN';
+  };
+
   const filteredOrders = orders.filter(order => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'accepted') return order.deliveryStatus === 'ACCEPTED';
-    if (activeTab === 'started') return order.deliveryStatus === 'PICKED_UP';
-    if (activeTab === 'completed') return order.deliveryStatus === 'DELIVERED';
+    const phase = getPhase(order);
+    if (activeTab === 'accepted') return phase === 'accepted';
+    if (activeTab === 'started') return phase === 'picked_up';
+    if (activeTab === 'completed') return phase === 'delivered';
     return true;
   });
 
@@ -65,18 +95,67 @@ export default function OrdersScreen() {
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    const s = String(status || '').toUpperCase();
+    switch (s) {
+      case 'ASSIGNED':
+      case 'DELIVERY_ASSIGNED':
       case 'ASSIGNED':
         return colors.status.info;
       case 'ACCEPTED':
+      case 'DELIVERY_ACCEPTED':
+      case 'ACCEPTED':
         return colors.status.warning;
+      case 'PICKED_UP':
+      case 'DELIVERY_PICKUP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+      case 'PICKED_UP':
       case 'PICKED_UP':
         return colors.primary.purple;
       case 'DELIVERED':
+      case 'DELIVERED':
         return colors.status.success;
       case 'REJECTED':
+      case 'REJECTED':
         return colors.status.error;
+      case 'PICKED_UP':
+      case 'PICKED_UP':
+        return colors.primary.purple;
       default:
+        // handle normalized phases too
+        if (s === 'PICKED_UP' || s === 'PICKED-UP' || s === 'DELIVERY_PICKUP') return colors.primary.purple;
+        if (s === 'ACCEPTED' || s === 'DELIVERY_ACCEPTED') return colors.status.warning;
+        if (s === 'DELIVERED') return colors.status.success;
+        if (s === 'REJECTED') return colors.status.error;
         return colors.text.secondary;
     }
   };
