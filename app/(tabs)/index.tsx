@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import colors from '@/constants/colors';
+import { useAuth } from '@/contexts/AuthContext';
+import { ordersApi } from '@/utils/api';
+import { useQuery } from '@tanstack/react-query';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Package, DollarSign, CheckCircle, Clock, TrendingUp } from 'lucide-react-native';
-import { useAuth } from '@/contexts/AuthContext';
-import { useQuery } from '@tanstack/react-query';
-import { ordersApi } from '@/utils/api';
-import colors from '@/constants/colors';
+import { CheckCircle, Clock, DollarSign, Package, TrendingUp } from 'lucide-react-native';
 import { useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -30,9 +30,34 @@ export default function DashboardScreen() {
     return orderDate.toDateString() === today.toDateString();
   });
 
-  const completedOrders = orders.filter(order => order.deliveryStatus === 'DELIVERED');
+  // Helper to get phase from order status
+  const getPhase = (order: any) => {
+    const s = order.status || order.deliveryStatus;
+    switch (s) {
+      case 'ASSIGNED':
+      case 'DELIVERY_ASSIGNED':
+        return 'assigned';
+      case 'ACCEPTED':
+      case 'DELIVERY_ACCEPTED':
+        return 'accepted';
+      case 'DELIVERY_PICKUP':
+      case 'PICKED_UP':
+        return 'picked_up';
+      case 'DELIVERED':
+        return 'delivered';
+      case 'REJECTED':
+        return 'rejected';
+      default:
+        return 'unknown';
+    }
+  };
+
+  const completedOrders = orders.filter(order => getPhase(order) === 'delivered');
   const activeOrders = orders.filter(
-    order => order.deliveryStatus === 'ACCEPTED' || order.deliveryStatus === 'PICKED_UP'
+    order => {
+      const phase = getPhase(order);
+      return phase === 'accepted' || phase === 'picked_up';
+    }
   );
 
   const todayEarnings = todayOrders

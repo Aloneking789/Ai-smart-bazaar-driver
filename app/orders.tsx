@@ -235,9 +235,9 @@ export default function OrdersScreen() {
                     <Package size={20} color={colors.primary.purple} />
                     <Text style={styles.shopName}>{order.shopkeeper.shopname}</Text>
                   </View>
-                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(order.deliveryStatus) + '20' }]}>
-                    <Text style={[styles.statusText, { color: getStatusColor(order.deliveryStatus) }]}>
-                      {order.deliveryStatus}
+                  <View style={[styles.statusBadge, { backgroundColor: getStatusColor(getPhase(order)) + '20' }]}>
+                    <Text style={[styles.statusText, { color: getStatusColor(getPhase(order)) }]}>
+                      {order.status || order.deliveryStatus}
                     </Text>
                   </View>
                 </View>
@@ -257,7 +257,7 @@ export default function OrdersScreen() {
                 </View>
 
                 <View style={styles.orderActions}>
-                  {order.deliveryStatus === 'ASSIGNED' && (
+                  {getPhase(order) === 'assigned' && (
                     <>
                       <TouchableOpacity
                         style={[styles.actionButton, styles.acceptButton]}
@@ -277,7 +277,7 @@ export default function OrdersScreen() {
                       </TouchableOpacity>
                     </>
                   )}
-                  {order.deliveryStatus === 'ACCEPTED' && (
+                  {getPhase(order) === 'accepted' && (
                     <TouchableOpacity
                       style={[styles.actionButton, styles.pickedButton]}
                       onPress={() => handleAction(order.id, 'picked-up')}
@@ -287,7 +287,7 @@ export default function OrdersScreen() {
                       <Text style={styles.actionButtonText}>Picked Up</Text>
                     </TouchableOpacity>
                   )}
-                  {order.deliveryStatus === 'PICKED_UP' && (
+                  {getPhase(order) === 'picked_up' && (
                     <TouchableOpacity
                       style={[styles.actionButton, styles.deliveredButton]}
                       onPress={() => handleAction(order.id, 'delivered')}
@@ -297,7 +297,7 @@ export default function OrdersScreen() {
                       <Text style={styles.actionButtonText}>Mark as Delivered</Text>
                     </TouchableOpacity>
                   )}
-                  {order.deliveryStatus === 'DELIVERED' && (
+                  {getPhase(order) === 'delivered' && (
                     <View style={styles.completedBadge}>
                       <CheckCircle size={18} color={colors.status.success} />
                       <Text style={styles.completedText}>Completed</Text>

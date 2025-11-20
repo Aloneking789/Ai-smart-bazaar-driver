@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.ai-smart-bazaar-driver"
+      "bundleIdentifier": "app.ai-smart-bazaar-driver"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.ai-smart-bazaar-driver"
+      "package": "com.aismartbazaardriver"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -39,6 +39,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://rork.com/"
+      },
+      "eas": {
+        "projectId": "edeb0a2b-d35d-4ab7-a29b-088f65f7797c"
+      }
     }
   }
 }
